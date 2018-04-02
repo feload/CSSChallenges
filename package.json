@@ -1,0 +1,14 @@
+{
+  "name": "csschallenges",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/feload/CSSChallenges.git",
+  "author": "Felipe <feload@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "browser-sync start --config bs-config.js"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.23.6"
+  }
+}
