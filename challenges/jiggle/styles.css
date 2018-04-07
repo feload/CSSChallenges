@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo|Barlow+Condensed');
+
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+html,
+body {
+  height: 100%;
+  background: rgb(237, 241, 241)
+}
+
+.jiggle__container {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.jiggle__button {
+  width: 150px;
+  height: 70px;
+  font-family: Baloo;
+  font-size: 20px;
+  border: 0px;
+  background: #95d486;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.jiggle__button--animated {
+  animation: jiggle 2s ease-in infinite;
+}
+
+@keyframes jiggle {
+  48%, 62% {
+    transform: scale(1.0, 1.0)
+  }
+
+  50% {
+    transform: scale(1.1, 0.9)
+  }
+
+  58% {
+    transform: scale(0.9, 1.1) translate (0, -5px)
+  }
+
+  58% {
+    transform: scale(1.0, 1.0)translate (0, -3px)
+  }
+
+}
