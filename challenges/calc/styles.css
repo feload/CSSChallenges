@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald');
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: rgb(236, 236, 236);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  color: #40454e;
+  font-size: 26px;
+}
+
+.calc__container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 10px;
+  width: 300px;
+  background: #5f6675;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 2px 2px 15px rgb(156, 156, 156);
+}
+
+.calc__screen {
+  grid-column-start: 1;
+  grid-column-end: 5;
+  height: 50px;
+  background: rgb(190, 239, 243);
+  border-radius: 10px;
+  padding: 5px 5px 3px 5px;
+  font-size: 65px;
+  font-family:'digital-7';
+  text-align: right;
+  box-shadow: 2px 2px 2px rgb(145, 190, 194) inset;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.calc__digit{
+  width: 32px;
+}
+
+.calc__number--masked{
+  position: absolute;
+  top: 4px;
+  padding-left: 1px;
+  opacity: 0.2;
+}
+
+/*
+.calc__screen-figure-container {
+  width: 40px;
+  display: flex;
+}
+
+.calc__screen-figure--mask {
+  opacity: 0.2;
+}
+
+.calc__screen-figure {
+  width: 40px;
+  text-align: right;
+  position: absolute;
+}
+*/
+
+.calc__button {
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 3px #3f434b;
+  cursor: pointer;
+}
+
+.calc__button:hover {
+  background:#ebe7e7;
+}
+
+.calc__button-special {
+  background: rgb(231, 240, 255);
+}
+.calc__button-special:hover {
+  background: rgb(196, 209, 233);
+}
+
+.calc__button-operand {
+  background: rgb(253, 255, 231);
+}
+.calc__button-operand:hover {
+  background: rgb(233, 236, 200);
+}
+
+.calc__button--expanded-2 {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+@font-face{
+ font-family:'digital-7';
+ src: url('fonts/digital-7.ttf');
+}
