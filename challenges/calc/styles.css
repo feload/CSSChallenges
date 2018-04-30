@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald');
-
 html,
 body {
   height: 100%;
@@ -10,7 +8,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Arial';
   color: #40454e;
   font-size: 26px;
 }

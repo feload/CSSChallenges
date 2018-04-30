@@ -10,31 +10,77 @@
 <body>
   <div class="calc">
     <div class="calc__container">
-      <div class="calc__screen">
-        <div class="calc__digit">
-          <div class="calc__number"></div>
-          <div class="calc__number calc__number--masked">0</div>
-        </div>
-      </div>
+
+      <!-- Row 1 -->
+      <div class="calc__screen"></div>
+      <!-- [End] Row 1 -->
+
+      <!-- Row 2 -->
       <div class="calc__button calc__button-special">AC</div>
       <div class="calc__button calc__button-special">+/-</div>
       <div class="calc__button calc__button-special">%</div>
       <div class="calc__button calc__button-operand">/</div>
-      <div class="calc__button calc__button-figure">7</div>
-      <div class="calc__button calc__button-figure">8</div>
-      <div class="calc__button calc__button-figure">9</div>
+      <!-- [End] Row 2 -->
+
+      <!-- Row 3 -->
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="7">7</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="8">8</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="9">9</div>
+
       <div class="calc__button calc__button-operand">X</div>
-      <div class="calc__button calc__button-figure">4</div>
-      <div class="calc__button calc__button-figure">5</div>
-      <div class="calc__button calc__button-figure">6</div>
+      <!-- [End] Row 3 -->
+
+      <!-- Row 4 -->
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="4">4</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="5">5</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="6">6</div>
+
       <div class="calc__button calc__button-operand">-</div>
-      <div class="calc__button calc__button-figure">1</div>
-      <div class="calc__button calc__button-figure">2</div>
-      <div class="calc__button calc__button-figure">3</div>
+      <!-- [End] Row 4 -->
+
+      <!-- Row 5 -->
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="1">1</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="2">2</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit="3">3</div>
+
       <div class="calc__button calc__button-operand">+</div>
-      <div class="calc__button calc__button-figure calc__button--expanded-2">0</div>
-      <div class="calc__button calc__button-figure">.</div>
+      <!-- [End] Row 5 -->
+
+      <!-- Row 6 -->
+      <div class="calc__button calc__button-figure calc__button--expanded-2"
+      data-hook="pushDigit"
+      data-digit="0">0</div>
+
+      <div class="calc__button calc__button-figure"
+      data-hook="pushDigit"
+      data-digit=".">.</div>
+
       <div class="calc__button calc__button-operand">=</div>
+      <!-- [End] Row 6 -->
     </div>
   </div>
   <script src="Calc.js"></script>
