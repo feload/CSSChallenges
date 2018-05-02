@@ -137,6 +137,18 @@ var Calculator = /** @class */ (function () {
         return tmpDigits.join("");
     };
     /**
+     * clearDigits();
+     * This method clears the digits :)
+     *
+     * @private
+     * @returns {*}
+     * @memberof Calculator
+     */
+    Calculator.prototype.clearDigits = function () {
+        this.digits = "";
+        this.drawDigits();
+    };
+    /**
      * keyUp().
      * This method detects the type of key pressed and processes it.
      *
@@ -151,6 +163,7 @@ var Calculator = /** @class */ (function () {
         var digitRegExp = new RegExp(/Digit/);
         var periodRegExp = new RegExp(/Period/);
         var numpadRegExp = new RegExp(/Numpad/);
+        var keyCRegExp = new RegExp(/KeyC/);
         console.log(evtCode, evtKey);
         switch (true) {
             case (backSpaceRegExp.test(evtCode)):
@@ -160,6 +173,10 @@ var Calculator = /** @class */ (function () {
             case (periodRegExp.test(evtCode)):
             case (numpadRegExp.test(evtCode)):
                 this.pushDigit(evtKey);
+                break;
+            case (keyCRegExp.test(evtCode)):
+                this.clearDigits();
+                break;
             default:
                 break;
         }
@@ -193,6 +210,7 @@ var Calculator = /** @class */ (function () {
     Calculator.prototype.pushDigit = function (digit) {
         if (!this.isDigitAllowed(digit))
             return;
+        // We'll ensure we have a 0 when first digit is a period: "0."
         if (digit === "." && this.digits.length === 0)
             digit = "0" + digit;
         if (this.digits.length < this.digitsMax + 1) {

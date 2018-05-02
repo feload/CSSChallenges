@@ -180,6 +180,19 @@ class Calculator {
   }
 
   /**
+   * clearDigits();
+   * This method clears the digits :)
+   *
+   * @private
+   * @returns {*}
+   * @memberof Calculator
+   */
+  private clearDigits(): any {
+    this.digits = "";
+    this.drawDigits();
+  }
+
+  /**
    * keyUp().
    * This method detects the type of key pressed and processes it.
    *
@@ -196,6 +209,7 @@ class Calculator {
     const digitRegExp: RegExp = new RegExp(/Digit/);
     const periodRegExp: RegExp = new RegExp(/Period/);
     const numpadRegExp: RegExp = new RegExp(/Numpad/);
+    const keyCRegExp: RegExp = new RegExp(/KeyC/);
 
     console.log(evtCode, evtKey);
 
@@ -207,6 +221,10 @@ class Calculator {
       case (periodRegExp.test(evtCode)):
       case (numpadRegExp.test(evtCode)):
         this.pushDigit(evtKey);
+        break;
+      case (keyCRegExp.test(evtCode)):
+        this.clearDigits();
+        break;
       default:
         break;
     }
@@ -241,6 +259,7 @@ class Calculator {
    */
   private pushDigit(digit: string) : void {
     if(!this.isDigitAllowed(digit)) return;
+    // We'll ensure we have a 0 when first digit is a period: "0."
     if(digit === "." && this.digits.length === 0) digit = `0${digit}`;
     if(this.digits.length < this.digitsMax + 1){ // +1 is for being able to show the error legend :p
       this.digits = this.digits.concat(digit);
