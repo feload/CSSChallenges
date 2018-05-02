@@ -25,11 +25,13 @@ class Calculator {
   private dom: DOM;
   private digitRE: RegExp;
   private defDigitRE: RegExp;
+  private allowedDigits: RegExp;
 
   constructor() {
     this.digits = "";
     this.digitsMax = 9;
     this.defaultDigit = "8";
+    this.allowedDigits = new RegExp(/[0-9\.]/);
     this.digitRE = new RegExp(/{digit}/);
     this.defDigitRE = new RegExp(/{defaultDigit}/);
     this.digitTpl = `
@@ -49,6 +51,9 @@ class Calculator {
   /**
    * Setup().
    * Application setup :)
+   *
+   * @private
+   * @memberof Calculator
    */
   private setup(): void {
     this.setDOM();
@@ -56,12 +61,14 @@ class Calculator {
     this.drawDigits();
   }
 
-
   /**
    * genDigitTpl();
    * Replaces data placeholders and return resulting string.
    *
-   * @param data: DigitTemplateData;
+   * @private
+   * @param {DigitTemplateData} data
+   * @returns {string}
+   * @memberof Calculator
    */
   private genDigitTpl(data: DigitTemplateData) : string {
     return this.digitTpl
@@ -69,6 +76,15 @@ class Calculator {
       .replace(this.defDigitRE, data.defaultDigit);
   }
 
+  /**
+   * prepareForScreen().
+   * Formats the digits for being displayed on screen.
+   *
+   * @private
+   * @param {string} digits
+   * @returns {string[]}
+   * @memberof Calculator
+   */
   private prepareForScren(digits: string): string[] {
     return (this.genEmptyDigits().substring(0, this.digitsMax - digits.length) + digits).split("");
   }
@@ -76,6 +92,9 @@ class Calculator {
   /**
    * drawDigits().
    * Draws all digits in the digits array.
+   *
+   * @private
+   * @memberof Calculator
    */
   private drawDigits () :void {
     const $screen = this.dom["calcScreen"].$el;
@@ -92,12 +111,14 @@ class Calculator {
     });
   }
 
-
   /**
    * $().
    * Returns a DOM element based on the received selector.
    *
-   * @param selector: string;
+   * @private
+   * @param {string} selector
+   * @returns {*}
+   * @memberof Calculator
    */
   private $(selector: string): any {
     return document.querySelector(selector);
@@ -107,7 +128,10 @@ class Calculator {
    * $$().
    * Returns all DOM elements based on the received selector.
    *
-   * @param selector: string;
+   * @private
+   * @param {string} selector
+   * @returns {*}
+   * @memberof Calculator
    */
   private $$(selector: string): any {
     return document.querySelectorAll(selector);
@@ -117,7 +141,11 @@ class Calculator {
    * genSelector().
    * Receives a string and returns a DOM element.
    *
-   * @param selector: string
+   * @private
+   * @param {string} selector
+   * @param {boolean} [all=false]
+   * @returns {Selector}
+   * @memberof Calculator
    */
   private genSelector(selector: string, all: boolean = false): Selector {
     const $el = (all) ? this.$$(selector) : this.$(selector);
@@ -127,6 +155,9 @@ class Calculator {
   /**
    * setDOM().
    * Defines a collection of selectors.
+   *
+   * @private
+   * @memberof Calculator
    */
   private setDOM(): void {
     this.dom["keysDetector"] = this.genSelector(".calc");
@@ -137,6 +168,10 @@ class Calculator {
   /**
    * genEmptyDigits().
    * Generates an empty array of digits.
+   *
+   * @private
+   * @returns {*}
+   * @memberof Calculator
    */
   private genEmptyDigits(): any {
     const tmpDigits: any = new Array(this.digitsMax);
@@ -145,28 +180,106 @@ class Calculator {
     return tmpDigits.join("");
   }
 
+  /**
+   * keyUp().
+   * This method detects the type of key pressed and processes it.
+   *
+   * @private
+   * @param {*} event
+   * @memberof Calculator
+   */
   private keyUp(event: any) {
-    console.log(event);
+
+    const evtCode = event.code;
+    const evtKey = event.key;
+
+    const backSpaceRegExp: RegExp = new RegExp(/Backspace/);
+    const digitRegExp: RegExp = new RegExp(/Digit/);
+    const periodRegExp: RegExp = new RegExp(/Period/);
+    const numpadRegExp: RegExp = new RegExp(/Numpad/);
+
+    console.log(evtCode);
+
+    switch (true) {
+      case (backSpaceRegExp.test(evtCode)):
+        this.popDigit();
+        break;
+      case (digitRegExp.test(evtCode)):
+      case (periodRegExp.test(evtCode)):
+      case (numpadRegExp.test(evtCode)):
+        this.pushDigit(evtKey);
+      default:
+        break;
+    }
   }
 
   /**
-   * pushDitit().
+   * isDigitAllowrd().
+   * Checks to see if a digit is valid to be inserted.
+   *
+   * @private
+   * @param {string} digit
+   * @returns
+   * @memberof Calculator
+   */
+  private isDigitAllowed(digit: string) {
+    return (this.allowedDigits.test(digit));
+  }
+
+  /**
+   * pushDigit().
    * Adds a digit to digits array.
    *
-   * @param event: any;
+   * @private
+   * @param {string} digit
+   * @returns {void}
+   * @memberof Calculator
    */
-  private pushDigit(event: any) : void {
-    this.digits = this.digits.concat(event.target.dataset.digit.toString());
+  private pushDigit(digit: string) : void {
+    if(!this.isDigitAllowed(digit)) return;
+    if(this.digits.length < this.digitsMax + 1){ // +1 is for being able to show the error legend :p
+      this.digits = this.digits.concat(digit);
+      this.drawDigits();
+    }
+  }
+
+  /**
+   * popDigit().
+   * Removes the last digit.
+   *
+   * @private
+   * @memberof Calculator
+   */
+  private popDigit(): void {
+    const digitsTmp = this.digits.split("");
+    digitsTmp.pop();
+    this.digits = digitsTmp.join("");
     this.drawDigits();
+  }
+
+  /**
+   * pushDigitClick().
+   * Handles click event from buttons.
+   *
+   * @private
+   * @param {*} event
+   * @memberof Calculator
+   */
+  private pushDigitClick(event: any): void {
+    const digit = event.target.dataset.digit.toString();
+    this.pushDigit(digit);
   }
 
   /**
    * setEvents().
    * Set events for the application.
+   *
+   * @private
+   * @memberof Calculator
    */
   private setEvents () :void {
     this.dom["hookPushDigit"].$el.forEach(($el: any) => {
-      $el.addEventListener('click', this.pushDigit.bind(this));
+      $el.addEventListener('click', this.pushDigitClick.bind(this));
     });
 
     document.onkeydown = this.keyUp.bind(this);
