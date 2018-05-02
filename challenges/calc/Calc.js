@@ -151,7 +151,7 @@ var Calculator = /** @class */ (function () {
         var digitRegExp = new RegExp(/Digit/);
         var periodRegExp = new RegExp(/Period/);
         var numpadRegExp = new RegExp(/Numpad/);
-        console.log(evtCode);
+        console.log(evtCode, evtKey);
         switch (true) {
             case (backSpaceRegExp.test(evtCode)):
                 this.popDigit();
@@ -174,7 +174,12 @@ var Calculator = /** @class */ (function () {
      * @memberof Calculator
      */
     Calculator.prototype.isDigitAllowed = function (digit) {
-        return (this.allowedDigits.test(digit));
+        if (!this.allowedDigits.test(digit))
+            return false;
+        var digits = this.digits.split("");
+        if (digit === "." && digits.includes(digit))
+            return false;
+        return true;
     };
     /**
      * pushDigit().
@@ -188,6 +193,8 @@ var Calculator = /** @class */ (function () {
     Calculator.prototype.pushDigit = function (digit) {
         if (!this.isDigitAllowed(digit))
             return;
+        if (digit === "." && this.digits.length === 0)
+            digit = "0" + digit;
         if (this.digits.length < this.digitsMax + 1) {
             this.digits = this.digits.concat(digit);
             this.drawDigits();

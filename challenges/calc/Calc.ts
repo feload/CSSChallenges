@@ -176,7 +176,6 @@ class Calculator {
   private genEmptyDigits(): any {
     const tmpDigits: any = new Array(this.digitsMax);
     tmpDigits.fill(" ");
-
     return tmpDigits.join("");
   }
 
@@ -198,7 +197,7 @@ class Calculator {
     const periodRegExp: RegExp = new RegExp(/Period/);
     const numpadRegExp: RegExp = new RegExp(/Numpad/);
 
-    console.log(evtCode);
+    console.log(evtCode, evtKey);
 
     switch (true) {
       case (backSpaceRegExp.test(evtCode)):
@@ -222,8 +221,13 @@ class Calculator {
    * @returns
    * @memberof Calculator
    */
-  private isDigitAllowed(digit: string) {
-    return (this.allowedDigits.test(digit));
+  private isDigitAllowed(digit: string): boolean {
+    if (!this.allowedDigits.test(digit)) return false;
+
+    const digits: string[] = this.digits.split("");
+    if (digit === "." && digits.includes(digit)) return false;
+
+    return true;
   }
 
   /**
@@ -237,6 +241,7 @@ class Calculator {
    */
   private pushDigit(digit: string) : void {
     if(!this.isDigitAllowed(digit)) return;
+    if(digit === "." && this.digits.length === 0) digit = `0${digit}`;
     if(this.digits.length < this.digitsMax + 1){ // +1 is for being able to show the error legend :p
       this.digits = this.digits.concat(digit);
       this.drawDigits();
