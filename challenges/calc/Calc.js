@@ -148,6 +148,13 @@ var Calculator = /** @class */ (function () {
         this.digits = "";
         this.drawDigits();
     };
+    Calculator.prototype.changeSign = function () {
+        if (this.digits.length < this.digitsMax) {
+            var number = (parseFloat(this.digits) * -1);
+            this.digits = number.toString();
+            this.drawDigits();
+        }
+    };
     /**
      * keyUp().
      * This method detects the type of key pressed and processes it.
@@ -164,6 +171,7 @@ var Calculator = /** @class */ (function () {
         var periodRegExp = new RegExp(/Period/);
         var numpadRegExp = new RegExp(/Numpad/);
         var keyCRegExp = new RegExp(/KeyC/);
+        var shiftRegExp = new RegExp(/Shift/);
         console.log(evtCode, evtKey);
         switch (true) {
             case (backSpaceRegExp.test(evtCode)):
@@ -177,12 +185,15 @@ var Calculator = /** @class */ (function () {
             case (keyCRegExp.test(evtCode)):
                 this.clearDigits();
                 break;
+            case (shiftRegExp.test(evtCode)):
+                this.changeSign();
+                break;
             default:
                 break;
         }
     };
     /**
-     * isDigitAllowrd().
+     * isDigitAllowed().
      * Checks to see if a digit is valid to be inserted.
      *
      * @private

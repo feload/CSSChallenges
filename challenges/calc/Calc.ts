@@ -187,9 +187,17 @@ class Calculator {
    * @returns {*}
    * @memberof Calculator
    */
-  private clearDigits(): any {
+  private clearDigits(): void {
     this.digits = "";
     this.drawDigits();
+  }
+
+  private changeSign(): void {
+    if(this.digits.length < this.digitsMax){
+      const number: number = (parseFloat(this.digits) * -1);
+      this.digits = number.toString();
+      this.drawDigits();
+    }
   }
 
   /**
@@ -210,6 +218,7 @@ class Calculator {
     const periodRegExp: RegExp = new RegExp(/Period/);
     const numpadRegExp: RegExp = new RegExp(/Numpad/);
     const keyCRegExp: RegExp = new RegExp(/KeyC/);
+    const shiftRegExp: RegExp = new RegExp(/Shift/);
 
     console.log(evtCode, evtKey);
 
@@ -225,13 +234,16 @@ class Calculator {
       case (keyCRegExp.test(evtCode)):
         this.clearDigits();
         break;
+      case (shiftRegExp.test(evtCode)):
+        this.changeSign();
+        break;
       default:
         break;
     }
   }
 
   /**
-   * isDigitAllowrd().
+   * isDigitAllowed().
    * Checks to see if a digit is valid to be inserted.
    *
    * @private
