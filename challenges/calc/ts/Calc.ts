@@ -1,15 +1,22 @@
-interface Selector {
+// ----------
+//  Interfaces.
+//  @TODO: These interfaces should be placed in their own file...
+//  @TODO: Add effects when button clicked or key pressed.
+//  @TODO: Add reference to source code.
+// ----------
+
+interface IDigitTemplateData {
+  digit: string,
+  defaultDigit: string
+}
+
+interface ISelector {
   selector: string,
   $el: any
 }
 
-interface DOM {
-  [id: string]: Selector
-}
-
-interface DigitTemplateData {
-  digit: string,
-  defaultDigit: string
+interface IDOM {
+  [id: string]: ISelector
 }
 
 class Calculator {
@@ -22,7 +29,7 @@ class Calculator {
   private digitsMax: number;
   private digitTpl: string;
   private defaultDigit: string;
-  private dom: DOM;
+  private dom: IDOM;
   private digitRE: RegExp;
   private defDigitRE: RegExp;
   private allowedDigits: RegExp;
@@ -70,11 +77,11 @@ class Calculator {
    * Replaces data placeholders and return resulting string.
    *
    * @private
-   * @param {DigitTemplateData} data
+   * @param {IDigitTemplateData} data
    * @returns {string}
    * @memberof Calculator
    */
-  private genDigitTpl(data: DigitTemplateData) : string {
+  private genDigitTpl(data: IDigitTemplateData) : string {
     return this.digitTpl
       .replace(this.digitRE, data.digit)
       .replace(this.defDigitRE, data.defaultDigit);
@@ -166,7 +173,7 @@ class Calculator {
    * @returns {Selector}
    * @memberof Calculator
    */
-  private genSelector(selector: string, all: boolean = false): Selector {
+  private genSelector(selector: string, all: boolean = false): ISelector {
     const $el = (all) ? this.$$(selector) : this.$(selector);
     return { selector, $el };
   }
@@ -183,6 +190,8 @@ class Calculator {
     this.dom["calcScreen"] = this.genSelector(".calc__screen");
     this.dom["calcResult"] = this.genSelector(".calc__result");
     this.dom["hookPushDigit"] = this.genSelector("[data-hook='pushDigit']", true);
+    this.dom["hookDoMaths"] = this.genSelector("[data-hook='doMaths']", true);
+    this.dom["hookDoSpecial"] = this.genSelector("[data-hook='doSpecial']", true);
   }
 
   /**
@@ -308,19 +317,17 @@ class Calculator {
         this.drawDigits();
       }
     }
-
-    console.log(this.operandsStack);
   }
 
   /**
-   * keyUp().
+   * engine().
    * This method detects the type of key pressed and processes it.
    *
    * @private
    * @param {*} event
    * @memberof Calculator
    */
-  private keyUp(event: any) {
+  private engine(event: any) : void {
 
     const evtCode = event.code;
     const evtKey = event.key;
@@ -329,18 +336,17 @@ class Calculator {
     const digitRegExp: RegExp = new RegExp(/Digit/);
     const moduleRegExp: RegExp = new RegExp(/%/);
     const periodRegExp: RegExp = new RegExp(/Period/);
-    const numpadRegExp: RegExp = new RegExp(/Numpad[0-9]/);
+    const numpadRegExp: RegExp = new RegExp(/Numpad[0-9\.]/);
     const numpadAddRegExp: RegExp = new RegExp(/NumpadAdd/);
     const numpadSubtractRegExp: RegExp = new RegExp(/NumpadSubtract/);
     const numpadMultiplyRegExp: RegExp = new RegExp(/NumpadMultiply/);
     const numpadDivideRegExp: RegExp = new RegExp(/NumpadDivide/);
+    const numpadOpRegExp: RegExp = new RegExp(/NumpadOp/);
     const enterRegExp: RegExp = new RegExp(/Enter/);
     const deleteRegExp: RegExp = new RegExp(/Delete/);
     const keyCRegExp: RegExp = new RegExp(/KeyC/);
     const keyXRegExp: RegExp = new RegExp(/KeyX/);
     const altRegExp: RegExp = new RegExp(/Alt/);
-
-    console.log(evtCode, evtKey);
 
     switch (true) {
 
@@ -352,6 +358,7 @@ class Calculator {
       case (numpadSubtractRegExp.test(evtCode)):
       case (numpadAddRegExp.test(evtCode)):
       case (numpadMultiplyRegExp.test(evtCode)):
+      case (numpadOpRegExp.test(evtCode)):
       case (numpadDivideRegExp.test(evtCode)):
       case (moduleRegExp.test(evtKey)):
         this.isDoingMaths = true;
@@ -445,7 +452,33 @@ class Calculator {
    */
   private pushDigitClick(event: any): void {
     const digit = event.target.dataset.digit.toString();
-    this.pushDigit(digit);
+    this.engine({ code: `Numpad${digit}`, key: digit });
+  }
+
+  /**
+   * doMathsClick().
+   * Handles click event from buttons.
+   *
+   * @private
+   * @param {*} event
+   * @memberof Calculator
+   */
+  private doMathsClick(event: any): void {
+    const op = event.target.dataset.op.toString();
+    this.engine({ code: "NumpadOp", key: op });
+  }
+
+  /**
+   * doSpecialClick().
+   * Handles click from special buttons.
+   *
+   * @private
+   * @param {*} event
+   * @memberof Calculator
+   */
+  private doSpecialClick(event: any) : void {
+    const op = event.target.dataset.op.toString();
+    this.engine({ code: op, key: '' });
   }
 
   /**
@@ -460,7 +493,15 @@ class Calculator {
       $el.addEventListener('click', this.pushDigitClick.bind(this));
     });
 
-    document.onkeydown = this.keyUp.bind(this);
+    this.dom["hookDoMaths"].$el.forEach(($el: any) => {
+      $el.addEventListener('click', this.doMathsClick.bind(this));
+    });
+
+    this.dom["hookDoSpecial"].$el.forEach(($el: any) => {
+      $el.addEventListener('click', this.doSpecialClick.bind(this));
+    });
+
+    document.onkeydown = this.engine.bind(this);
   }
 
 }

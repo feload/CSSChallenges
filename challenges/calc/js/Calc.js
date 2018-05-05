@@ -1,3 +1,8 @@
+// ----------
+//  Interfaces.
+//  @TODO: These interfaces should be placed in their own file...
+//  @TODO: Add effects when button clicked or key pressed.
+// ----------
 var Calculator = /** @class */ (function () {
     function Calculator() {
         this.digits = "";
@@ -32,7 +37,7 @@ var Calculator = /** @class */ (function () {
      * Replaces data placeholders and return resulting string.
      *
      * @private
-     * @param {DigitTemplateData} data
+     * @param {IDigitTemplateData} data
      * @returns {string}
      * @memberof Calculator
      */
@@ -138,6 +143,8 @@ var Calculator = /** @class */ (function () {
         this.dom["calcScreen"] = this.genSelector(".calc__screen");
         this.dom["calcResult"] = this.genSelector(".calc__result");
         this.dom["hookPushDigit"] = this.genSelector("[data-hook='pushDigit']", true);
+        this.dom["hookDoMaths"] = this.genSelector("[data-hook='doMaths']", true);
+        this.dom["hookDoSpecial"] = this.genSelector("[data-hook='doSpecial']", true);
     };
     /**
      * genEmptyDigits().
@@ -260,34 +267,33 @@ var Calculator = /** @class */ (function () {
                 this.drawDigits();
             }
         }
-        console.log(this.operandsStack);
     };
     /**
-     * keyUp().
+     * engine().
      * This method detects the type of key pressed and processes it.
      *
      * @private
      * @param {*} event
      * @memberof Calculator
      */
-    Calculator.prototype.keyUp = function (event) {
+    Calculator.prototype.engine = function (event) {
         var evtCode = event.code;
         var evtKey = event.key;
         var backSpaceRegExp = new RegExp(/Backspace/);
         var digitRegExp = new RegExp(/Digit/);
         var moduleRegExp = new RegExp(/%/);
         var periodRegExp = new RegExp(/Period/);
-        var numpadRegExp = new RegExp(/Numpad[0-9]/);
+        var numpadRegExp = new RegExp(/Numpad[0-9\.]/);
         var numpadAddRegExp = new RegExp(/NumpadAdd/);
         var numpadSubtractRegExp = new RegExp(/NumpadSubtract/);
         var numpadMultiplyRegExp = new RegExp(/NumpadMultiply/);
         var numpadDivideRegExp = new RegExp(/NumpadDivide/);
+        var numpadOpRegExp = new RegExp(/NumpadOp/);
         var enterRegExp = new RegExp(/Enter/);
         var deleteRegExp = new RegExp(/Delete/);
         var keyCRegExp = new RegExp(/KeyC/);
         var keyXRegExp = new RegExp(/KeyX/);
         var altRegExp = new RegExp(/Alt/);
-        console.log(evtCode, evtKey);
         switch (true) {
             case (deleteRegExp.test(evtCode)):
             case (backSpaceRegExp.test(evtCode)):
@@ -296,6 +302,7 @@ var Calculator = /** @class */ (function () {
             case (numpadSubtractRegExp.test(evtCode)):
             case (numpadAddRegExp.test(evtCode)):
             case (numpadMultiplyRegExp.test(evtCode)):
+            case (numpadOpRegExp.test(evtCode)):
             case (numpadDivideRegExp.test(evtCode)):
             case (moduleRegExp.test(evtKey)):
                 this.isDoingMaths = true;
@@ -383,7 +390,31 @@ var Calculator = /** @class */ (function () {
      */
     Calculator.prototype.pushDigitClick = function (event) {
         var digit = event.target.dataset.digit.toString();
-        this.pushDigit(digit);
+        this.engine({ code: "Numpad" + digit, key: digit });
+    };
+    /**
+     * doMathsClick().
+     * Handles click event from buttons.
+     *
+     * @private
+     * @param {*} event
+     * @memberof Calculator
+     */
+    Calculator.prototype.doMathsClick = function (event) {
+        var op = event.target.dataset.op.toString();
+        this.engine({ code: "NumpadOp", key: op });
+    };
+    /**
+     * doSpecialClick().
+     * Handles click from special buttons.
+     *
+     * @private
+     * @param {*} event
+     * @memberof Calculator
+     */
+    Calculator.prototype.doSpecialClick = function (event) {
+        var op = event.target.dataset.op.toString();
+        this.engine({ code: op, key: '' });
     };
     /**
      * setEvents().
@@ -397,7 +428,13 @@ var Calculator = /** @class */ (function () {
         this.dom["hookPushDigit"].$el.forEach(function ($el) {
             $el.addEventListener('click', _this.pushDigitClick.bind(_this));
         });
-        document.onkeydown = this.keyUp.bind(this);
+        this.dom["hookDoMaths"].$el.forEach(function ($el) {
+            $el.addEventListener('click', _this.doMathsClick.bind(_this));
+        });
+        this.dom["hookDoSpecial"].$el.forEach(function ($el) {
+            $el.addEventListener('click', _this.doSpecialClick.bind(_this));
+        });
+        document.onkeydown = this.engine.bind(this);
     };
     return Calculator;
 }());

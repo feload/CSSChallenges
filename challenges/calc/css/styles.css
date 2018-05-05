@@ -51,23 +51,6 @@ body {
   opacity: 0.2;
 }
 
-/*
-.calc__screen-figure-container {
-  width: 40px;
-  display: flex;
-}
-
-.calc__screen-figure--mask {
-  opacity: 0.2;
-}
-
-.calc__screen-figure {
-  width: 40px;
-  text-align: right;
-  position: absolute;
-}
-*/
-
 .calc__button {
   background: white;
   border-radius: 10px;
@@ -102,5 +85,5 @@ body {
 
 @font-face{
  font-family:'digital-7';
- src: url('fonts/digital-7.ttf');
+ src: url('../fonts/digital-7.ttf');
 }
