@@ -26,14 +26,14 @@ class Calculator {
   private digitRE: RegExp;
   private defDigitRE: RegExp;
   private allowedDigits: RegExp;
-  private operandsStack: number[];
-  private doingMaths: boolean;
+  private operandsStack: string[];
+  private isDoingMaths: boolean;
 
   constructor() {
     this.digits = "";
-    this.doingMaths = false;
     this.operandsStack = [];
     this.digitsMax = 9;
+    this.isDoingMaths = false;
     this.defaultDigit = "8";
     this.allowedDigits = new RegExp(/[0-9\.]/);
     this.digitRE = new RegExp(/{digit}/);
@@ -221,7 +221,6 @@ class Calculator {
    */
   private clearMaths() : void {
     this.operandsStack = [];
-    this.doingMaths = false;
   }
 
   /**
@@ -248,17 +247,21 @@ class Calculator {
    * @returns {number}
    * @memberof Calculator
    */
-  private reduceOperands(op: string): number {
-    const [a, b] = this.operandsStack;
+  private reduceOperands(): number {
+    let [a, op, b] = this.operandsStack;
+    let operandA = parseFloat(a);
+    let operandB = parseFloat(b);
+
     switch (op) {
       case "+":
-        return a + b;
+        return operandA + operandB;
       case "-":
-        return a - b;
+        return operandA - operandB;
+      case "x":
       case "*":
-        return a * b;
+        return operandA * operandB;
       case "/":
-        return a / b;
+        return operandA / operandB;
       default:
         return 0;
     };
@@ -275,13 +278,23 @@ class Calculator {
    */
   private doMaths(op: string) : void {
     if (!this.digits.length) return;
-    this.doingMaths = true;
-    this.operandsStack.push(parseFloat(this.digits));
 
-    if (this.operandsStack.length == 2) {
-      const result: number = this.reduceOperands(op);
-      this.digits = result.toString();
-      this.operandsStack = [result];
+    if(this.operandsStack.length < 2) {
+      if (op != "=") {
+        this.operandsStack.push(this.digits, op);
+        this.clearDigits();
+      }
+    } else {
+      this.operandsStack.push(this.digits);
+      const result: string = this.reduceOperands().toString();
+      if(op == "="){
+        this.operandsStack = [];
+        this.isDoingMaths = false;
+      }else{
+        this.operandsStack = [result, op];
+        this.clearDigits();
+      }
+      this.digits = result;
       this.drawDigits();
     }
   }
@@ -305,21 +318,28 @@ class Calculator {
     const numpadRegExp: RegExp = new RegExp(/Numpad[0-9]/);
     const numpadAddRegExp: RegExp = new RegExp(/NumpadAdd/);
     const numpadSubtractRegExp: RegExp = new RegExp(/NumpadSubtract/);
+    const numpadMultiplyRegExp: RegExp = new RegExp(/NumpadMultiply/);
+    const numpadDivideRegExp: RegExp = new RegExp(/NumpadDivide/);
+    const enterRegExp: RegExp = new RegExp(/Enter/);
+    const deleteRegExp: RegExp = new RegExp(/Delete/);
     const keyCRegExp: RegExp = new RegExp(/KeyC/);
+    const keyXRegExp: RegExp = new RegExp(/KeyX/);
     const shiftRegExp: RegExp = new RegExp(/Shift/);
 
     console.log(evtCode, evtKey);
 
     switch (true) {
+      case (deleteRegExp.test(evtCode)):
       case (backSpaceRegExp.test(evtCode)):
         this.popDigit();
         break;
+
       case (digitRegExp.test(evtCode)):
       case (periodRegExp.test(evtCode)):
       case (numpadRegExp.test(evtCode)):
-        if (this.doingMaths){
+        if (this.operandsStack.length == 2 && this.isDoingMaths == true) {
+          this.isDoingMaths = false;
           this.clearDigits();
-          this.doingMaths = false;
         }
         this.pushDigit(evtKey);
         break;
@@ -327,16 +347,23 @@ class Calculator {
         this.clearDigits();
         this.clearMaths();
         break;
+
       case (shiftRegExp.test(evtCode)):
         this.changeDigitsSign();
         break;
+
       case (numpadSubtractRegExp.test(evtCode)):
       case (numpadAddRegExp.test(evtCode)):
+      case (numpadMultiplyRegExp.test(evtCode)):
+      case (numpadDivideRegExp.test(evtCode)):
+        this.isDoingMaths = true;
         this.doMaths(evtKey);
         this.outputResultToDOM();
         break;
-      default:
-        break;
+
+      case (enterRegExp.test(evtCode)):
+        this.doMaths("=");
+      break
     }
   }
 

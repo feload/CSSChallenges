@@ -1,9 +1,9 @@
 var Calculator = /** @class */ (function () {
     function Calculator() {
         this.digits = "";
-        this.doingMaths = false;
         this.operandsStack = [];
         this.digitsMax = 9;
+        this.isDoingMaths = false;
         this.defaultDigit = "8";
         this.allowedDigits = new RegExp(/[0-9\.]/);
         this.digitRE = new RegExp(/{digit}/);
@@ -53,6 +53,13 @@ var Calculator = /** @class */ (function () {
     Calculator.prototype.prepareForScren = function (digits) {
         return (this.genEmptyDigits().substring(0, this.digitsMax - digits.length) + digits).split("");
     };
+    /**
+     * outputResultToDOM().
+     * Outputs result to DOM :p
+     *
+     * @private
+     * @memberof Calculator
+     */
     Calculator.prototype.outputResultToDOM = function () {
         var $result = this.dom["calcResult"].$el;
         $result.value = this.digits;
@@ -157,9 +164,15 @@ var Calculator = /** @class */ (function () {
         this.digits = "";
         this.drawDigits();
     };
+    /**
+     * clearMaths().
+     * Clear operand stack and flag.
+     *
+     * @private
+     * @memberof Calculator
+     */
     Calculator.prototype.clearMaths = function () {
         this.operandsStack = [];
-        this.maths = "";
     };
     /**
      * changeDigitsSign().
@@ -175,31 +188,64 @@ var Calculator = /** @class */ (function () {
             this.drawDigits();
         }
     };
-    Calculator.prototype.reduceOperands = function (op) {
-        var _a = this.operandsStack, a = _a[0], b = _a[1];
+    /**
+     * reduceOperands().
+     * Reduces the operand stack.
+     *
+     * @private
+     * @param {string} op
+     * @returns {number}
+     * @memberof Calculator
+     */
+    Calculator.prototype.reduceOperands = function () {
+        var _a = this.operandsStack, a = _a[0], op = _a[1], b = _a[2];
+        var operandA = parseFloat(a);
+        var operandB = parseFloat(b);
         switch (op) {
             case "+":
-                return a + b;
+                return operandA + operandB;
             case "-":
-                return a - b;
+                return operandA - operandB;
+            case "x":
             case "*":
-                return a * b;
+                return operandA * operandB;
             case "/":
-                return a / b;
+                return operandA / operandB;
             default:
                 return 0;
         }
         ;
     };
+    /**
+     * doMaths().
+     * Does the maths.
+     *
+     * @private
+     * @param {string} op
+     * @returns {void}
+     * @memberof Calculator
+     */
     Calculator.prototype.doMaths = function (op) {
         if (!this.digits.length)
             return;
-        this.doingMaths = true;
-        this.operandsStack.push(parseFloat(this.digits));
-        if (this.operandsStack.length == 2) {
-            var result = this.reduceOperands(op);
-            this.digits = result.toString();
-            this.operandsStack = [result];
+        if (this.operandsStack.length < 2) {
+            if (op != "=") {
+                this.operandsStack.push(this.digits, op);
+                this.clearDigits();
+            }
+        }
+        else {
+            this.operandsStack.push(this.digits);
+            var result = this.reduceOperands().toString();
+            if (op == "=") {
+                this.operandsStack = [];
+                this.isDoingMaths = false;
+            }
+            else {
+                this.operandsStack = [result, op];
+                this.clearDigits();
+            }
+            this.digits = result;
             this.drawDigits();
         }
     };
@@ -220,19 +266,25 @@ var Calculator = /** @class */ (function () {
         var numpadRegExp = new RegExp(/Numpad[0-9]/);
         var numpadAddRegExp = new RegExp(/NumpadAdd/);
         var numpadSubtractRegExp = new RegExp(/NumpadSubtract/);
+        var numpadMultiplyRegExp = new RegExp(/NumpadMultiply/);
+        var numpadDivideRegExp = new RegExp(/NumpadDivide/);
+        var enterRegExp = new RegExp(/Enter/);
+        var deleteRegExp = new RegExp(/Delete/);
         var keyCRegExp = new RegExp(/KeyC/);
+        var keyXRegExp = new RegExp(/KeyX/);
         var shiftRegExp = new RegExp(/Shift/);
         console.log(evtCode, evtKey);
         switch (true) {
+            case (deleteRegExp.test(evtCode)):
             case (backSpaceRegExp.test(evtCode)):
                 this.popDigit();
                 break;
             case (digitRegExp.test(evtCode)):
             case (periodRegExp.test(evtCode)):
             case (numpadRegExp.test(evtCode)):
-                if (this.doingMaths) {
+                if (this.operandsStack.length == 2 && this.isDoingMaths == true) {
+                    this.isDoingMaths = false;
                     this.clearDigits();
-                    this.doingMaths = false;
                 }
                 this.pushDigit(evtKey);
                 break;
@@ -245,10 +297,14 @@ var Calculator = /** @class */ (function () {
                 break;
             case (numpadSubtractRegExp.test(evtCode)):
             case (numpadAddRegExp.test(evtCode)):
+            case (numpadMultiplyRegExp.test(evtCode)):
+            case (numpadDivideRegExp.test(evtCode)):
+                this.isDoingMaths = true;
                 this.doMaths(evtKey);
                 this.outputResultToDOM();
                 break;
-            default:
+            case (enterRegExp.test(evtCode)):
+                this.doMaths("=");
                 break;
         }
     };
