@@ -260,6 +260,7 @@ class Calculator {
       case "x":
       case "*":
         return operandA * operandB;
+      case "%":
       case "/":
         return operandA / operandB;
       default:
@@ -270,6 +271,7 @@ class Calculator {
   /**
    * doMaths().
    * Does the maths.
+   * @TODO: Refactorize.
    *
    * @private
    * @param {string} op
@@ -279,24 +281,35 @@ class Calculator {
   private doMaths(op: string) : void {
     if (!this.digits.length) return;
 
-    if(this.operandsStack.length < 2) {
-      if (op != "=") {
-        this.operandsStack.push(this.digits, op);
-        this.clearDigits();
-      }
-    } else {
-      this.operandsStack.push(this.digits);
-      const result: string = this.reduceOperands().toString();
-      if(op == "="){
-        this.operandsStack = [];
-        this.isDoingMaths = false;
-      }else{
-        this.operandsStack = [result, op];
-        this.clearDigits();
-      }
+    let result: string = "";
+    if (op == '%') {
+      this.operandsStack.push(this.digits, op, '100');
+      result = this.reduceOperands().toString();
+      this.operandsStack = [];
       this.digits = result;
       this.drawDigits();
+    }else{
+      if(this.operandsStack.length < 2) {
+        if (op != "=") {
+          this.operandsStack.push(this.digits, op);
+          this.clearDigits();
+        }
+      } else {
+        this.operandsStack.push(this.digits);
+        result = this.reduceOperands().toString();
+        if(op == "="){
+          this.operandsStack = [];
+          this.isDoingMaths = false;
+        }else{
+          this.operandsStack = [result, op];
+          this.clearDigits();
+        }
+        this.digits = result;
+        this.drawDigits();
+      }
     }
+
+    console.log(this.operandsStack);
   }
 
   /**
@@ -314,6 +327,7 @@ class Calculator {
 
     const backSpaceRegExp: RegExp = new RegExp(/Backspace/);
     const digitRegExp: RegExp = new RegExp(/Digit/);
+    const moduleRegExp: RegExp = new RegExp(/%/);
     const periodRegExp: RegExp = new RegExp(/Period/);
     const numpadRegExp: RegExp = new RegExp(/Numpad[0-9]/);
     const numpadAddRegExp: RegExp = new RegExp(/NumpadAdd/);
@@ -324,14 +338,25 @@ class Calculator {
     const deleteRegExp: RegExp = new RegExp(/Delete/);
     const keyCRegExp: RegExp = new RegExp(/KeyC/);
     const keyXRegExp: RegExp = new RegExp(/KeyX/);
-    const shiftRegExp: RegExp = new RegExp(/Shift/);
+    const altRegExp: RegExp = new RegExp(/Alt/);
 
     console.log(evtCode, evtKey);
 
     switch (true) {
+
       case (deleteRegExp.test(evtCode)):
       case (backSpaceRegExp.test(evtCode)):
         this.popDigit();
+        break;
+
+      case (numpadSubtractRegExp.test(evtCode)):
+      case (numpadAddRegExp.test(evtCode)):
+      case (numpadMultiplyRegExp.test(evtCode)):
+      case (numpadDivideRegExp.test(evtCode)):
+      case (moduleRegExp.test(evtKey)):
+        this.isDoingMaths = true;
+        this.doMaths(evtKey);
+        this.outputResultToDOM();
         break;
 
       case (digitRegExp.test(evtCode)):
@@ -343,22 +368,14 @@ class Calculator {
         }
         this.pushDigit(evtKey);
         break;
+
       case (keyCRegExp.test(evtCode)):
         this.clearDigits();
         this.clearMaths();
         break;
 
-      case (shiftRegExp.test(evtCode)):
+      case (altRegExp.test(evtCode)):
         this.changeDigitsSign();
-        break;
-
-      case (numpadSubtractRegExp.test(evtCode)):
-      case (numpadAddRegExp.test(evtCode)):
-      case (numpadMultiplyRegExp.test(evtCode)):
-      case (numpadDivideRegExp.test(evtCode)):
-        this.isDoingMaths = true;
-        this.doMaths(evtKey);
-        this.outputResultToDOM();
         break;
 
       case (enterRegExp.test(evtCode)):
