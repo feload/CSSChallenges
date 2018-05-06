@@ -1,7 +1,13 @@
 // ----------
 //  Interfaces.
-//  @TODO: These interfaces should be placed in their own file...
-//  @TODO: Add effects when button clicked or key pressed.
+//  @TODOS: Disable alt key when no digits.
+//          Remove all digits when last digit is a negative number.
+//          Add effects when button clicked or key pressed.
+//          Add comment signature.
+//          Add reference to source code.
+//          These interfaces should be placed in their own file...
+//          Add unit/e2e tests.
+//          Refactor.
 // ----------
 var Calculator = /** @class */ (function () {
     function Calculator() {
@@ -208,26 +214,26 @@ var Calculator = /** @class */ (function () {
         var _a = this.operandsStack, a = _a[0], op = _a[1], b = _a[2];
         var operandA = parseFloat(a);
         var operandB = parseFloat(b);
+        var result = 0;
         switch (op) {
             case "+":
-                return operandA + operandB;
+                result = operandA + operandB;
             case "-":
-                return operandA - operandB;
+                result = operandA - operandB;
             case "x":
             case "*":
-                return operandA * operandB;
+                result = operandA * operandB;
             case "%":
             case "/":
-                return operandA / operandB;
-            default:
-                return 0;
+                result = operandA / operandB;
+                break;
         }
         ;
+        return parseFloat(result.toFixed(2));
     };
     /**
      * doMaths().
      * Does the maths.
-     * @TODO: Refactorize.
      *
      * @private
      * @param {string} op

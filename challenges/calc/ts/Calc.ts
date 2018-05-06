@@ -1,8 +1,13 @@
 // ----------
 //  Interfaces.
-//  @TODO: These interfaces should be placed in their own file...
-//  @TODO: Add effects when button clicked or key pressed.
-//  @TODO: Add reference to source code.
+//  @TODOS: Disable alt key when no digits.
+//          Remove all digits when last digit is a negative number.
+//          Add effects when button clicked or key pressed.
+//          Add comment signature.
+//          Add reference to source code.
+//          These interfaces should be placed in their own file...
+//          Add unit/e2e tests.
+//          Refactor.
 // ----------
 
 interface IDigitTemplateData {
@@ -257,30 +262,32 @@ class Calculator {
    * @memberof Calculator
    */
   private reduceOperands(): number {
+
     let [a, op, b] = this.operandsStack;
     let operandA = parseFloat(a);
     let operandB = parseFloat(b);
+    let result: number = 0;
 
     switch (op) {
       case "+":
-        return operandA + operandB;
+        result = operandA + operandB;
       case "-":
-        return operandA - operandB;
+        result = operandA - operandB;
       case "x":
       case "*":
-        return operandA * operandB;
+        result = operandA * operandB;
       case "%":
       case "/":
-        return operandA / operandB;
-      default:
-        return 0;
+        result = operandA / operandB;
+      break;
     };
+
+    return parseFloat(result.toFixed(2));
   }
 
   /**
    * doMaths().
    * Does the maths.
-   * @TODO: Refactorize.
    *
    * @private
    * @param {string} op
