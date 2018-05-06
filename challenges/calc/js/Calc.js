@@ -1,7 +1,6 @@
 // ----------
 //  Interfaces.
-//  @TODOS: Disable alt key when no digits.
-//          Remove all digits when last digit is a negative number.
+//  @TODOS: Remove all digits when last digit is a negative number.
 //          Add effects when button clicked or key pressed.
 //          Add comment signature.
 //          Add reference to source code.
@@ -382,7 +381,12 @@ var Calculator = /** @class */ (function () {
      */
     Calculator.prototype.popDigit = function () {
         var digitsTmp = this.digits.split("");
-        digitsTmp.pop();
+        if (this.digits.length == 2 && this.digits[0] == "-") {
+            digitsTmp = [];
+        }
+        else {
+            digitsTmp.pop();
+        }
         this.digits = digitsTmp.join("");
         this.drawDigits();
     };
