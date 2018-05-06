@@ -87,3 +87,65 @@ body {
  font-family:'digital-7';
  src: url('../fonts/digital-7.ttf');
 }
+
+.references {
+  opacity: 0.4;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+/*
+@TODO: Remove duplicate code and refactor it.
+
+I tried to apply the same effect over a button but I couldn't
+make the browser detect it so I had to duplicate the effect.
+*/
+.calc__button--pressed{
+  animation: bounce 0.5s ease;
+}
+
+.calc__button--pressed2{
+  animation: bounce2 0.5s ease;
+}
+
+/* Yes, I know. I also hate duplicate code... */
+
+@keyframes bounce {
+    0%, 100%   {
+      transform: translate(0px, 0px);
+      -webkit-transform: translate(0px, 0px);
+      -moz-transform: translate(0px, 0px);
+      -o-transform: translate(0px, 0px);
+      -ms-transform: translate(0px, 0px);
+      box-shadow: 0 3px #3f434b;
+    }
+    50%  {
+      transform: translate(0px, 3px);
+      -webkit-transform: translate(0px, 3px);
+      -moz-transform: translate(0px, 3px);
+      -o-transform: translate(0px, 3px);
+      -ms-transform: translate(0px, 3px);
+      box-shadow: 0 1px;
+    }
+}
+
+@keyframes bounce2 {
+    0%, 100%   {
+      transform: translate(0px, 0px);
+      -webkit-transform: translate(0px, 0px);
+      -moz-transform: translate(0px, 0px);
+      -o-transform: translate(0px, 0px);
+      -ms-transform: translate(0px, 0px);
+      box-shadow: 0 3px #3f434b;
+    }
+    50%  {
+      transform: translate(0px, 3px);
+      -webkit-transform: translate(0px, 3px);
+      -moz-transform: translate(0px, 3px);
+      -o-transform: translate(0px, 3px);
+      -ms-transform: translate(0px, 3px);
+      box-shadow: 0 1px;
+    }
+}

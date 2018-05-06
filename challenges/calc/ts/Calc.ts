@@ -1,10 +1,6 @@
 // ----------
 //  Interfaces.
-//  @TODOS: Remove all digits when last digit is a negative number.
-//          Add effects when button clicked or key pressed.
-//          Add comment signature.
-//          Add reference to source code.
-//          These interfaces should be placed in their own file...
+//  @TODOS: These interfaces should be placed in their own file...
 //          Add unit/e2e tests.
 //          Refactor.
 // ----------
@@ -22,6 +18,15 @@ interface ISelector {
 interface IDOM {
   [id: string]: ISelector
 }
+
+/**
+ * Calculator.
+ * This class is part of my typescript learning journey.
+ * It's not that fancy but it helped me a lot to learn some of the basic stuff regarding TS.
+ * There's a lot more to learn.
+ *
+ * @class Calculator
+ */
 
 class Calculator {
 
@@ -270,15 +275,18 @@ class Calculator {
     switch (op) {
       case "+":
         result = operandA + operandB;
+      break;
       case "-":
         result = operandA - operandB;
+        break;
       case "x":
       case "*":
         result = operandA * operandB;
+        break;
       case "%":
       case "/":
         result = operandA / operandB;
-      break;
+        break;
     };
 
     return parseFloat(result.toFixed(2));
@@ -325,6 +333,22 @@ class Calculator {
     }
   }
 
+  private runEffect (event: any) {
+    const { key, code } = event;
+    const op = (key) ? key : code;
+    const $el = this.$(`[data-op="${op}"]`);
+
+    if ($el.classList.contains('calc__button--pressed')) {
+      $el.classList.add('calc__button--pressed2');
+      $el.classList.remove('calc__button--pressed')
+    } else if ($el.classList.contains('calc__button--pressed2')) {
+      $el.classList.add('calc__button--pressed');
+      $el.classList.remove('calc__button--pressed2')
+    }else{
+      $el.classList.add('calc__button--pressed');
+    }
+  }
+
   /**
    * engine().
    * This method detects the type of key pressed and processes it.
@@ -337,6 +361,8 @@ class Calculator {
 
     const evtCode = event.code;
     const evtKey = event.key;
+
+    this.runEffect(event);
 
     const backSpaceRegExp: RegExp = new RegExp(/Backspace/);
     const digitRegExp: RegExp = new RegExp(/Digit/);
@@ -461,7 +487,7 @@ class Calculator {
    * @memberof Calculator
    */
   private pushDigitClick(event: any): void {
-    const digit = event.target.dataset.digit.toString();
+    const digit = event.target.dataset.op.toString();
     this.engine({ code: `Numpad${digit}`, key: digit });
   }
 
