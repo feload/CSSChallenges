@@ -245,7 +245,7 @@ class Calculator {
    * @memberof Calculator
    */
   private changeDigitsSign(): void {
-    if(this.digits.length < this.digitsMax){
+    if(this.digits.length < this.digitsMax && this.digits.length > 0){
       const number: number = (parseFloat(this.digits) * -1);
       this.digits = number.toString();
       this.drawDigits();

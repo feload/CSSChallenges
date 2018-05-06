@@ -195,7 +195,7 @@ var Calculator = /** @class */ (function () {
      * @memberof Calculator
      */
     Calculator.prototype.changeDigitsSign = function () {
-        if (this.digits.length < this.digitsMax) {
+        if (this.digits.length < this.digitsMax && this.digits.length > 0) {
             var number = (parseFloat(this.digits) * -1);
             this.digits = number.toString();
             this.drawDigits();
