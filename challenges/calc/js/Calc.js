@@ -15,6 +15,7 @@
 var Calculator = /** @class */ (function () {
     function Calculator() {
         this.digits = "";
+        this.isNegativeFirstNumber = false;
         this.operandsStack = [];
         this.digitsMax = 9;
         this.isDoingMaths = false;
@@ -218,23 +219,7 @@ var Calculator = /** @class */ (function () {
         var operandA = parseFloat(a);
         var operandB = parseFloat(b);
         var result = 0;
-        switch (op) {
-            case "+":
-                result = operandA + operandB;
-                break;
-            case "-":
-                result = operandA - operandB;
-                break;
-            case "x":
-            case "*":
-                result = operandA * operandB;
-                break;
-            case "%":
-            case "/":
-                result = operandA / operandB;
-                break;
-        }
-        ;
+        result = eval("" + a + op + b);
         return parseFloat(result.toFixed(2));
     };
     /**
@@ -284,16 +269,18 @@ var Calculator = /** @class */ (function () {
         var key = event.key, code = event.code;
         var op = (key) ? key : code;
         var $el = this.$("[data-op=\"" + op + "\"]");
-        if ($el.classList.contains('calc__button--pressed')) {
-            $el.classList.add('calc__button--pressed2');
-            $el.classList.remove('calc__button--pressed');
-        }
-        else if ($el.classList.contains('calc__button--pressed2')) {
-            $el.classList.add('calc__button--pressed');
-            $el.classList.remove('calc__button--pressed2');
-        }
-        else {
-            $el.classList.add('calc__button--pressed');
+        if ($el) {
+            if ($el.classList.contains('calc__button--pressed')) {
+                $el.classList.add('calc__button--pressed2');
+                $el.classList.remove('calc__button--pressed');
+            }
+            else if ($el.classList.contains('calc__button--pressed2')) {
+                $el.classList.add('calc__button--pressed');
+                $el.classList.remove('calc__button--pressed2');
+            }
+            else {
+                $el.classList.add('calc__button--pressed');
+            }
         }
     };
     /**
@@ -329,9 +316,12 @@ var Calculator = /** @class */ (function () {
                 this.popDigit();
                 break;
             case (numpadSubtractRegExp.test(evtCode)):
+            case (numpadOpRegExp.test(evtCode)):
+                if (evtKey == "-" && this.digits.length == 0 && this.operandsStack.length == 0) {
+                    this.isNegativeFirstNumber = true;
+                }
             case (numpadAddRegExp.test(evtCode)):
             case (numpadMultiplyRegExp.test(evtCode)):
-            case (numpadOpRegExp.test(evtCode)):
             case (numpadDivideRegExp.test(evtCode)):
             case (moduleRegExp.test(evtKey)):
                 this.isDoingMaths = true;
@@ -392,6 +382,10 @@ var Calculator = /** @class */ (function () {
         if (digit === "." && this.digits.length === 0)
             digit = "0" + digit;
         if (this.digits.length < this.digitsMax + 1) {
+            if (this.isNegativeFirstNumber) {
+                this.digits = this.digits.concat("-");
+                this.isNegativeFirstNumber = false;
+            }
             this.digits = this.digits.concat(digit);
             this.drawDigits();
         }
@@ -473,3 +467,4 @@ var Calculator = /** @class */ (function () {
     return Calculator;
 }());
 new Calculator();
+//# sourceMappingURL=Calc.js.map

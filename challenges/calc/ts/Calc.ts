@@ -44,9 +44,11 @@ class Calculator {
   private allowedDigits: RegExp;
   private operandsStack: string[];
   private isDoingMaths: boolean;
+  private isNegativeFirstNumber: boolean;
 
   constructor() {
     this.digits = "";
+    this.isNegativeFirstNumber = false;
     this.operandsStack = [];
     this.digitsMax = 9;
     this.isDoingMaths = false;
@@ -272,23 +274,7 @@ class Calculator {
     let operandB = parseFloat(b);
     let result: number = 0;
 
-    switch (op) {
-      case "+":
-        result = operandA + operandB;
-      break;
-      case "-":
-        result = operandA - operandB;
-        break;
-      case "x":
-      case "*":
-        result = operandA * operandB;
-        break;
-      case "%":
-      case "/":
-        result = operandA / operandB;
-        break;
-    };
-
+    result = eval(`${a}${op}${b}`);
     return parseFloat(result.toFixed(2));
   }
 
@@ -337,15 +323,16 @@ class Calculator {
     const { key, code } = event;
     const op = (key) ? key : code;
     const $el = this.$(`[data-op="${op}"]`);
-
-    if ($el.classList.contains('calc__button--pressed')) {
-      $el.classList.add('calc__button--pressed2');
-      $el.classList.remove('calc__button--pressed')
-    } else if ($el.classList.contains('calc__button--pressed2')) {
-      $el.classList.add('calc__button--pressed');
-      $el.classList.remove('calc__button--pressed2')
-    }else{
-      $el.classList.add('calc__button--pressed');
+    if ($el) {
+      if ($el.classList.contains('calc__button--pressed')) {
+        $el.classList.add('calc__button--pressed2');
+        $el.classList.remove('calc__button--pressed')
+      } else if ($el.classList.contains('calc__button--pressed2')) {
+        $el.classList.add('calc__button--pressed');
+        $el.classList.remove('calc__button--pressed2')
+      }else{
+        $el.classList.add('calc__button--pressed');
+      }
     }
   }
 
@@ -388,9 +375,12 @@ class Calculator {
         break;
 
       case (numpadSubtractRegExp.test(evtCode)):
+      case (numpadOpRegExp.test(evtCode)):
+        if (evtKey == "-" && this.digits.length == 0 && this.operandsStack.length == 0){
+          this.isNegativeFirstNumber = true;
+        }
       case (numpadAddRegExp.test(evtCode)):
       case (numpadMultiplyRegExp.test(evtCode)):
-      case (numpadOpRegExp.test(evtCode)):
       case (numpadDivideRegExp.test(evtCode)):
       case (moduleRegExp.test(evtKey)):
         this.isDoingMaths = true;
@@ -455,6 +445,10 @@ class Calculator {
     // We'll ensure we have a 0 when first digit is a period: "0."
     if(digit === "." && this.digits.length === 0) digit = `0${digit}`;
     if(this.digits.length < this.digitsMax + 1){ // +1 is for being able to show the error legend :p
+      if (this.isNegativeFirstNumber) {
+        this.digits = this.digits.concat("-");
+        this.isNegativeFirstNumber = false;
+      }
       this.digits = this.digits.concat(digit);
       this.drawDigits();
     }
